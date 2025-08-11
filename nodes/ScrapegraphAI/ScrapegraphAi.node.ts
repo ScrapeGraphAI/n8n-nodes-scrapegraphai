@@ -9,6 +9,7 @@ import type {
 import { smartscraperFields, smartscraperOperations } from '../SmartscraperDescription';
 import { searchscraperFields, searchscraperOperations } from '../SearchscraperDescription';
 import { markdownifyFields, markdownifyOperations } from '../MarkdownifyDescription';
+import { smartcrawlerFields, smartcrawlerOperations } from '../SmartcrawlerDescription';
 
 export class ScrapegraphAi implements INodeType {
 	description: INodeTypeDescription = {
@@ -18,7 +19,7 @@ export class ScrapegraphAi implements INodeType {
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Consume ScrapegraphAI API',
+		description: 'Turn any webpage into usable data in one shot – ScrapegraphAI explores the website and extracts the content you need.',
 		defaults: {
 			name: 'ScrapegraphAI',
 		},
@@ -46,6 +47,10 @@ export class ScrapegraphAi implements INodeType {
 						value: 'searchscraper',
 					},
 					{
+						name: 'Smart Crawler',
+						value: 'smartcrawler',
+					},
+					{
 						name: 'Markdownify',
 						value: 'markdownify',
 					},
@@ -56,6 +61,8 @@ export class ScrapegraphAi implements INodeType {
 			...smartscraperFields,
 			...searchscraperOperations,
 			...searchscraperFields,
+			...smartcrawlerOperations,
+			...smartcrawlerFields,
 			...markdownifyOperations,
 			...markdownifyFields,
 		],
@@ -107,6 +114,52 @@ export class ScrapegraphAi implements INodeType {
 							},
 							body: {
 								user_prompt: userPrompt,
+							},
+							json: true,
+						});
+
+						returnData.push({ json: response, pairedItem: { item: i } });
+					}
+				}
+
+				if (resource === 'smartcrawler') {
+					if (operation === 'crawl') {
+						const url = this.getNodeParameter('url', i) as string;
+						const prompt = this.getNodeParameter('prompt', i) as string;
+						const cacheWebsite = this.getNodeParameter('cacheWebsite', i) as boolean;
+						const depth = this.getNodeParameter('depth', i) as number;
+						const maxPages = this.getNodeParameter('maxPages', i) as number;
+						const sameDomainOnly = this.getNodeParameter('sameDomainOnly', i) as boolean;
+
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+							method: 'POST',
+							url: `${baseUrl}/crawl`,
+							headers: {
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body: {
+								url: url,
+								prompt: prompt,
+								cache_website: cacheWebsite,
+								depth: depth,
+								max_pages: maxPages,
+								same_domain_only: sameDomainOnly,
+							},
+							json: true,
+						});
+
+						returnData.push({ json: response, pairedItem: { item: i } });
+					}
+
+					if (operation === 'getStatus') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+							method: 'GET',
+							url: `${baseUrl}/crawl/${taskId}`,
+							headers: {
+								'Accept': 'application/json',
 							},
 							json: true,
 						});

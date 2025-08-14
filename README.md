@@ -4,7 +4,7 @@
   <img src="./nodes/scrapegraphAI.svg" width="250" alt="ScrapegraphAI Logo">
 </p>
 
-This is a node for [ScrapegraphAI](https://scrapegraphai.com) for n8n. It allows you to use ScrapegraphAI's powerful web scraping and data extraction capabilities within your n8n workflows.
+This is the official node for [ScrapegraphAI](https://scrapegraphai.com) for n8n. It allows you to use ScrapegraphAI's powerful web scraping and data extraction capabilities within your n8n workflows.
 
 ## Installation
 

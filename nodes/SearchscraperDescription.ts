@@ -16,6 +16,7 @@ export const searchscraperOperations: INodeProperties[] = [
 				name: 'Search',
 				value: 'search',
 				action: 'Perform AI-powered site-wide search and structured data extraction – ideal for knowledge retrieval.',
+				description: 'Perform AI-powered site-wide search and structured data extraction – ideal for knowledge retrieval.',
 			},
 		],
 		default: 'search',

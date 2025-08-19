@@ -15,8 +15,8 @@ export const smartscraperOperations: INodeProperties[] = [
 			{
 				name: 'Scrape',
 				value: 'scrape',
-				action: 'Autonomously extract live data from any website – perfect for e-commerce, job boards & lead capture and more',
-				description: 'Autonomously extract live data from any website – perfect for e-commerce, job boards & lead capture and more',
+				action: 'Autonomously extract live data from any website perfect for e commerce job boards lead capture and more',
+				description: 'Autonomously extract live data from any website – perfect for e-commerce, job boards, lead capture and more',
 			},
 		],
 		default: 'scrape',

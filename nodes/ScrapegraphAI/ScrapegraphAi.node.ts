@@ -10,6 +10,7 @@ import { smartscraperFields, smartscraperOperations } from '../SmartscraperDescr
 import { searchscraperFields, searchscraperOperations } from '../SearchscraperDescription';
 import { markdownifyFields, markdownifyOperations } from '../MarkdownifyDescription';
 import { smartcrawlerFields, smartcrawlerOperations } from '../SmartcrawlerDescription';
+import { agenticscraperFields, agenticscraperOperations } from '../AgenticscraperDescription';
 
 export class ScrapegraphAi implements INodeType {
 	description: INodeTypeDescription = {
@@ -54,6 +55,10 @@ export class ScrapegraphAi implements INodeType {
 						name: 'Markdownify',
 						value: 'markdownify',
 					},
+					{
+						name: 'Agentic Scraper',
+						value: 'agenticscraper',
+					},
 				],
 				default: 'smartscraper',
 			},
@@ -65,6 +70,8 @@ export class ScrapegraphAi implements INodeType {
 			...smartcrawlerFields,
 			...markdownifyOperations,
 			...markdownifyFields,
+			...agenticscraperOperations,
+			...agenticscraperFields,
 		],
 	};
 
@@ -181,6 +188,34 @@ export class ScrapegraphAi implements INodeType {
 							},
 							body: {
 								website_url: websiteUrl,
+							},
+							json: true,
+						});
+
+						returnData.push({ json: response, pairedItem: { item: i } });
+					}
+				}
+
+				if (resource === 'agenticscraper') {
+					if (operation === 'automate') {
+						const url = this.getNodeParameter('url', i) as string;
+						const useSession = this.getNodeParameter('useSession', i) as boolean;
+						const stepsData = this.getNodeParameter('steps', i) as { stepItems: Array<{ step: string }> };
+						
+						// Extract steps from the fixedCollection format
+						const steps = stepsData.stepItems.map(item => item.step);
+
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+							method: 'POST',
+							url: `${baseUrl}/agenticscraper`,
+							headers: {
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body: {
+								url: url,
+								use_session: useSession,
+								steps: steps,
 							},
 							json: true,
 						});

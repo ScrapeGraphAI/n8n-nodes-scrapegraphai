@@ -43,7 +43,7 @@ export const agenticscraperFields: INodeProperties[] = [
 		name: 'useSession',
 		type: 'boolean',
 		default: true,
-		description: 'Whether to maintain session state across interactions',
+		description: 'Whether to maintain session state across interactions (persistent browser session)',
 		displayOptions: {
 			show: {
 				resource: ['agenticscraper'],
@@ -65,7 +65,7 @@ export const agenticscraperFields: INodeProperties[] = [
 				},
 			],
 		},
-		description: 'List of automation steps to perform',
+		description: 'List of automation steps to perform on the website',
 		displayOptions: {
 			show: {
 				resource: ['agenticscraper'],
@@ -83,11 +83,53 @@ export const agenticscraperFields: INodeProperties[] = [
 						type: 'string',
 						default: '',
 						required: true,
-						description: 'Automation step description (e.g., "Type email@gmail.com in email input box")',
+						description: 'Automation step description (e.g., "Type email@gmail.com in email input box", "click on login button")',
 						placeholder: 'Type email@gmail.com in email input box',
 					},
 				],
 			},
 		],
+	},
+	{
+		displayName: 'AI Extraction',
+		name: 'aiExtraction',
+		type: 'boolean',
+		default: false,
+		description: 'Whether to use AI for structured data extraction instead of returning markdown',
+		displayOptions: {
+			show: {
+				resource: ['agenticscraper'],
+				operation: ['automate'],
+			},
+		},
+	},
+	{
+		displayName: 'User Prompt',
+		name: 'userPrompt',
+		type: 'string',
+		default: '',
+		description: 'Instructions for AI extraction (e.g., "Extract user information and available dashboard sections")',
+		displayOptions: {
+			show: {
+				resource: ['agenticscraper'],
+				operation: ['automate'],
+				aiExtraction: [true],
+			},
+		},
+	},
+	{
+		displayName: 'Output Schema',
+		name: 'outputSchema',
+		type: 'json',
+		default: '{}',
+		description: 'JSON schema defining the structure of extracted data when using AI extraction',
+		displayOptions: {
+			show: {
+				resource: ['agenticscraper'],
+				operation: ['automate'],
+				aiExtraction: [true],
+			},
+		},
+		placeholder: '{"user_info": {"type": "object", "properties": {"username": {"type": "string"}, "email": {"type": "string"}}}}',
 	},
 ];

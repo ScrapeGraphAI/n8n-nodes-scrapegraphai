@@ -54,17 +54,15 @@ export const agenticscraperFields: INodeProperties[] = [
 	{
 		displayName: 'Steps',
 		name: 'steps',
-		type: 'fixedCollection',
+		type: 'collection',
 		typeOptions: {
 			multipleValues: true,
 		},
-		default: {
-			stepItems: [
-				{
-					step: '',
-				},
-			],
-		},
+		default: [
+			{
+				step: '',
+			},
+		],
 		description: 'List of automation steps to perform on the website',
 		displayOptions: {
 			show: {
@@ -74,19 +72,13 @@ export const agenticscraperFields: INodeProperties[] = [
 		},
 		options: [
 			{
-				displayName: 'Step Items',
-				name: 'stepItems',
-				values: [
-					{
-						displayName: 'Step',
-						name: 'step',
-						type: 'string',
-						default: '',
-						required: true,
-						description: 'Automation step description (e.g., "Type email@gmail.com in email input box", "click on login button")',
-						placeholder: 'Type email@gmail.com in email input box',
-					},
-				],
+				displayName: 'Step',
+				name: 'step',
+				type: 'string',
+				default: '',
+				required: true,
+				description: 'Automation step description (e.g., "Type email@gmail.com in email input box", "click on login button")',
+				placeholder: 'Type email@gmail.com in email input box',
 			},
 		],
 	},

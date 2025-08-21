@@ -200,10 +200,26 @@ export class ScrapegraphAi implements INodeType {
 					if (operation === 'automate') {
 						const url = this.getNodeParameter('url', i) as string;
 						const useSession = this.getNodeParameter('useSession', i) as boolean;
-						const stepsData = this.getNodeParameter('steps', i) as { stepItems: Array<{ step: string }> };
+						const stepsData = this.getNodeParameter('steps', i) as Array<{ step: string }>;
+						const aiExtraction = this.getNodeParameter('aiExtraction', i) as boolean;
 						
-						// Extract steps from the fixedCollection format
-						const steps = stepsData.stepItems.map(item => item.step);
+						// Extract steps from the collection format
+						const steps = stepsData.map(item => item.step);
+
+						const body: any = {
+							url: url,
+							use_session: useSession,
+							steps: steps,
+						};
+
+						// Add AI extraction parameters if enabled
+						if (aiExtraction) {
+							const userPrompt = this.getNodeParameter('userPrompt', i) as string;
+							const outputSchema = this.getNodeParameter('outputSchema', i) as string;
+							
+							body.user_prompt = userPrompt;
+							body.output_schema = outputSchema;
+						}
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
 							method: 'POST',
@@ -212,11 +228,7 @@ export class ScrapegraphAi implements INodeType {
 								'Accept': 'application/json',
 								'Content-Type': 'application/json',
 							},
-							body: {
-								url: url,
-								use_session: useSession,
-								steps: steps,
-							},
+							body: body,
 							json: true,
 						});
 

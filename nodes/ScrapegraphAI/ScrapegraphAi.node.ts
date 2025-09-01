@@ -82,6 +82,23 @@ export class ScrapegraphAi implements INodeType {
 					if (operation === 'scrape') {
 						const websiteUrl = this.getNodeParameter('websiteUrl', i) as string;
 						const userPrompt = this.getNodeParameter('userPrompt', i) as string;
+						const numberOfScrolls = this.getNodeParameter('numberOfScrolls', i) as number;
+						const totalPages = this.getNodeParameter('totalPages', i) as number;
+
+						const requestBody: any = {
+							website_url: websiteUrl,
+							user_prompt: userPrompt,
+						};
+
+						// Add number_of_scrolls if provided and greater than 0
+						if (numberOfScrolls && numberOfScrolls > 0) {
+							requestBody.number_of_scrolls = numberOfScrolls;
+						}
+
+						// Add total_pages if provided and greater than 1
+						if (totalPages && totalPages > 1) {
+							requestBody.total_pages = totalPages;
+						}
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
 							method: 'POST',
@@ -90,10 +107,7 @@ export class ScrapegraphAi implements INodeType {
 								'Accept': 'application/json',
 								'Content-Type': 'application/json',
 							},
-							body: {
-								website_url: websiteUrl,
-								user_prompt: userPrompt,
-							},
+							body: requestBody,
 							json: true,
 						});
 
@@ -104,6 +118,24 @@ export class ScrapegraphAi implements INodeType {
 				if (resource === 'searchscraper') {
 					if (operation === 'search') {
 						const userPrompt = this.getNodeParameter('userPrompt', i) as string;
+						const numResults = this.getNodeParameter('numResults', i) as number;
+						const numberOfScrolls = this.getNodeParameter('numberOfScrolls', i) as number;
+						const totalPages = this.getNodeParameter('totalPages', i) as number;
+
+						const requestBody: any = {
+							user_prompt: userPrompt,
+							num_results: numResults,
+						};
+
+						// Add number_of_scrolls if provided and greater than 0
+						if (numberOfScrolls && numberOfScrolls > 0) {
+							requestBody.number_of_scrolls = numberOfScrolls;
+						}
+
+						// Add total_pages if provided and greater than 1
+						if (totalPages && totalPages > 1) {
+							requestBody.total_pages = totalPages;
+						}
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
 							method: 'POST',
@@ -112,9 +144,7 @@ export class ScrapegraphAi implements INodeType {
 								'Accept': 'application/json',
 								'Content-Type': 'application/json',
 							},
-							body: {
-								user_prompt: userPrompt,
-							},
+							body: requestBody,
 							json: true,
 						});
 

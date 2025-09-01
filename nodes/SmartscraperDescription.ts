@@ -52,4 +52,30 @@ export const smartscraperFields: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Number of Scrolls',
+		name: 'numberOfScrolls',
+		type: 'number',
+		default: 0,
+		description: 'Number of times to scroll down the page to load more content (infinite scrolling)',
+		displayOptions: {
+			show: {
+				resource: ['smartscraper'],
+				operation: ['scrape'],
+			},
+		},
+	},
+	{
+		displayName: 'Total Pages',
+		name: 'totalPages',
+		type: 'number',
+		default: 1,
+		description: 'Total number of pages to scrape for pagination',
+		displayOptions: {
+			show: {
+				resource: ['smartscraper'],
+				operation: ['scrape'],
+			},
+		},
+	},
 ]; 

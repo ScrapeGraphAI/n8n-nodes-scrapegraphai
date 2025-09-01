@@ -52,6 +52,7 @@ export const smartscraperFields: INodeProperties[] = [
 			},
 		},
 	},
+	{
 		displayName: 'Number of Scrolls',
 		name: 'numberOfScrolls',
 		type: 'number',

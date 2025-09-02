@@ -124,4 +124,32 @@ export const smartcrawlerFields: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Use Custom Output Schema',
+		name: 'useOutputSchema',
+		type: 'boolean',
+		default: false,
+		description: 'Enable to define a custom JSON schema for structured output',
+		displayOptions: {
+			show: {
+				resource: ['smartcrawler'],
+				operation: ['crawl'],
+			},
+		},
+	},
+	{
+		displayName: 'Output Schema',
+		name: 'outputSchema',
+		type: 'json',
+		required: true,
+		default: '{\n  "type": "object",\n  "title": "CrawlResultSchema",\n  "properties": {\n    "companies": {\n      "type": "array",\n      "title": "companies",\n      "description": "List of companies",\n      "items": {\n        "$ref": "#/$defs/CompanySchema"\n      }\n    }\n  },\n  "required": ["companies"],\n  "$defs": {\n    "CompanySchema": {\n      "type": "object",\n      "title": "CompanySchema",\n      "properties": {\n        "name": {\n          "type": "string",\n          "title": "name",\n          "description": "Company name"\n        },\n        "description": {\n          "type": "string",\n          "title": "description",\n          "description": "Company description"\n        },\n        "website": {\n          "type": "string",\n          "title": "website",\n          "description": "Company website URL"\n        }\n      },\n      "required": ["name", "description"]\n    }\n  }\n}',
+		description: 'JSON schema to structure the output. Define properties with types and descriptions.',
+		displayOptions: {
+			show: {
+				resource: ['smartcrawler'],
+				operation: ['crawl'],
+				useOutputSchema: [true],
+			},
+		},
+	},
 ]; 

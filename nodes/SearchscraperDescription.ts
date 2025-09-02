@@ -38,4 +38,32 @@ export const searchscraperFields: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Use Custom Output Schema',
+		name: 'useOutputSchema',
+		type: 'boolean',
+		default: false,
+		description: 'Enable to define a custom JSON schema for structured output',
+		displayOptions: {
+			show: {
+				resource: ['searchscraper'],
+				operation: ['search'],
+			},
+		},
+	},
+	{
+		displayName: 'Output Schema',
+		name: 'outputSchema',
+		type: 'json',
+		required: true,
+		default: '{\n  "type": "object",\n  "title": "SearchResultSchema",\n  "properties": {\n    "articles": {\n      "type": "array",\n      "title": "articles",\n      "description": "List of articles",\n      "items": {\n        "$ref": "#/$defs/ArticleSchema"\n      }\n    }\n  },\n  "required": ["articles"],\n  "$defs": {\n    "ArticleSchema": {\n      "type": "object",\n      "title": "ArticleSchema",\n      "properties": {\n        "title": {\n          "type": "string",\n          "title": "title",\n          "description": "Article title"\n        },\n        "author": {\n          "type": "string",\n          "title": "author",\n          "description": "Author name"\n        },\n        "publishDate": {\n          "type": "string",\n          "title": "publishDate",\n          "description": "Publication date"\n        }\n      },\n      "required": ["title", "author"]\n    }\n  }\n}',
+		description: 'JSON schema to structure the output. Define properties with types and descriptions.',
+		displayOptions: {
+			show: {
+				resource: ['searchscraper'],
+				operation: ['search'],
+				useOutputSchema: [true],
+			},
+		},
+	},
 ]; 

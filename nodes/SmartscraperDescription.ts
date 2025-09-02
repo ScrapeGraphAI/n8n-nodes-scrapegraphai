@@ -52,4 +52,32 @@ export const smartscraperFields: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Use Custom Output Schema',
+		name: 'useOutputSchema',
+		type: 'boolean',
+		default: false,
+		description: 'Enable to define a custom JSON schema for structured output',
+		displayOptions: {
+			show: {
+				resource: ['smartscraper'],
+				operation: ['scrape'],
+			},
+		},
+	},
+	{
+		displayName: 'Output Schema',
+		name: 'outputSchema',
+		type: 'json',
+		required: true,
+		default: '{\n  "type": "object",\n  "title": "ProductSchema",\n  "properties": {\n    "title": {\n      "type": "string",\n      "title": "title",\n      "description": "Product title"\n    },\n    "price": {\n      "type": "number",\n      "title": "price",\n      "description": "Product price"\n    },\n    "description": {\n      "type": "string",\n      "title": "description",\n      "description": "Product description"\n    }\n  },\n  "required": ["title", "price", "description"]\n}',
+		description: 'JSON schema to structure the output. Define properties with types and descriptions.',
+		displayOptions: {
+			show: {
+				resource: ['smartscraper'],
+				operation: ['scrape'],
+				useOutputSchema: [true],
+			},
+		},
+	},
 ]; 

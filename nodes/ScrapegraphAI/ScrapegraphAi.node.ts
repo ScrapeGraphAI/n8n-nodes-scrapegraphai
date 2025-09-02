@@ -82,6 +82,22 @@ export class ScrapegraphAi implements INodeType {
 					if (operation === 'scrape') {
 						const websiteUrl = this.getNodeParameter('websiteUrl', i) as string;
 						const userPrompt = this.getNodeParameter('userPrompt', i) as string;
+						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
+
+						const requestBody: any = {
+							website_url: websiteUrl,
+							user_prompt: userPrompt,
+						};
+
+						// Add output_schema if enabled and provided
+						if (useOutputSchema) {
+							const outputSchema = this.getNodeParameter('outputSchema', i) as string;
+							try {
+								requestBody.output_schema = JSON.parse(outputSchema);
+							} catch (error) {
+								throw new Error(`Invalid JSON in Output Schema: ${error.message}`);
+							}
+						}
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
 							method: 'POST',
@@ -90,10 +106,7 @@ export class ScrapegraphAi implements INodeType {
 								'Accept': 'application/json',
 								'Content-Type': 'application/json',
 							},
-							body: {
-								website_url: websiteUrl,
-								user_prompt: userPrompt,
-							},
+							body: requestBody,
 							json: true,
 						});
 
@@ -104,6 +117,21 @@ export class ScrapegraphAi implements INodeType {
 				if (resource === 'searchscraper') {
 					if (operation === 'search') {
 						const userPrompt = this.getNodeParameter('userPrompt', i) as string;
+						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
+
+						const requestBody: any = {
+							user_prompt: userPrompt,
+						};
+
+						// Add output_schema if enabled and provided
+						if (useOutputSchema) {
+							const outputSchema = this.getNodeParameter('outputSchema', i) as string;
+							try {
+								requestBody.output_schema = JSON.parse(outputSchema);
+							} catch (error) {
+								throw new Error(`Invalid JSON in Output Schema: ${error.message}`);
+							}
+						}
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
 							method: 'POST',
@@ -112,9 +140,7 @@ export class ScrapegraphAi implements INodeType {
 								'Accept': 'application/json',
 								'Content-Type': 'application/json',
 							},
-							body: {
-								user_prompt: userPrompt,
-							},
+							body: requestBody,
 							json: true,
 						});
 
@@ -130,6 +156,26 @@ export class ScrapegraphAi implements INodeType {
 						const depth = this.getNodeParameter('depth', i) as number;
 						const maxPages = this.getNodeParameter('maxPages', i) as number;
 						const sameDomainOnly = this.getNodeParameter('sameDomainOnly', i) as boolean;
+						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
+
+						const requestBody: any = {
+							url: url,
+							prompt: prompt,
+							cache_website: cacheWebsite,
+							depth: depth,
+							max_pages: maxPages,
+							same_domain_only: sameDomainOnly,
+						};
+
+						// Add output_schema if enabled and provided
+						if (useOutputSchema) {
+							const outputSchema = this.getNodeParameter('outputSchema', i) as string;
+							try {
+								requestBody.output_schema = JSON.parse(outputSchema);
+							} catch (error) {
+								throw new Error(`Invalid JSON in Output Schema: ${error.message}`);
+							}
+						}
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
 							method: 'POST',
@@ -138,14 +184,7 @@ export class ScrapegraphAi implements INodeType {
 								'Accept': 'application/json',
 								'Content-Type': 'application/json',
 							},
-							body: {
-								url: url,
-								prompt: prompt,
-								cache_website: cacheWebsite,
-								depth: depth,
-								max_pages: maxPages,
-								same_domain_only: sameDomainOnly,
-							},
+							body: requestBody,
 							json: true,
 						});
 

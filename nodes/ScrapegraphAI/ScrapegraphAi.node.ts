@@ -83,10 +83,12 @@ export class ScrapegraphAi implements INodeType {
 						const websiteUrl = this.getNodeParameter('websiteUrl', i) as string;
 						const userPrompt = this.getNodeParameter('userPrompt', i) as string;
 						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
+						const renderHeavyJs = this.getNodeParameter('renderHeavyJs', i, false) as boolean;
 
 						const requestBody: any = {
 							website_url: websiteUrl,
 							user_prompt: userPrompt,
+							render_heavy_js: renderHeavyJs,
 						};
 
 						// Add output_schema if enabled and provided
@@ -157,6 +159,7 @@ export class ScrapegraphAi implements INodeType {
 						const maxPages = this.getNodeParameter('maxPages', i) as number;
 						const sameDomainOnly = this.getNodeParameter('sameDomainOnly', i) as boolean;
 						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
+						const renderHeavyJs = this.getNodeParameter('renderHeavyJs', i, false) as boolean;
 
 						const requestBody: any = {
 							url: url,
@@ -165,6 +168,7 @@ export class ScrapegraphAi implements INodeType {
 							depth: depth,
 							max_pages: maxPages,
 							same_domain_only: sameDomainOnly,
+							render_heavy_js: renderHeavyJs,
 						};
 
 						// Add output_schema if enabled and provided
@@ -210,6 +214,7 @@ export class ScrapegraphAi implements INodeType {
 				if (resource === 'markdownify') {
 					if (operation === 'convert') {
 						const websiteUrl = this.getNodeParameter('websiteUrl', i) as string;
+						const renderHeavyJs = this.getNodeParameter('renderHeavyJs', i, false) as boolean;
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
 							method: 'POST',
@@ -220,6 +225,7 @@ export class ScrapegraphAi implements INodeType {
 							},
 							body: {
 								website_url: websiteUrl,
+								render_heavy_js: renderHeavyJs,
 							},
 							json: true,
 						});

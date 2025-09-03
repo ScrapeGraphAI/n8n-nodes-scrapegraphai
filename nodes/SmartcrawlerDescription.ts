@@ -152,4 +152,17 @@ export const smartcrawlerFields: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Render Heavy JS',
+		name: 'renderHeavyJs',
+		type: 'boolean',
+		default: false,
+		description: 'Enable to render JavaScript-heavy websites (additional credits will be charged)',
+		displayOptions: {
+			show: {
+				resource: ['smartcrawler'],
+				operation: ['crawl'],
+			},
+		},
+	},
 ]; 

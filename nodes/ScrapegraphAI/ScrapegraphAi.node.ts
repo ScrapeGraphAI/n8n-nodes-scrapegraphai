@@ -10,6 +10,7 @@ import { smartscraperFields, smartscraperOperations } from '../SmartscraperDescr
 import { searchscraperFields, searchscraperOperations } from '../SearchscraperDescription';
 import { markdownifyFields, markdownifyOperations } from '../MarkdownifyDescription';
 import { smartcrawlerFields, smartcrawlerOperations } from '../SmartcrawlerDescription';
+import { agenticscraperFields, agenticscraperOperations } from '../AgenticscraperDescription';
 
 export class ScrapegraphAi implements INodeType {
 	description: INodeTypeDescription = {
@@ -54,6 +55,10 @@ export class ScrapegraphAi implements INodeType {
 						name: 'Markdownify',
 						value: 'markdownify',
 					},
+					{
+						name: 'Agentic Scraper',
+						value: 'agenticscraper',
+					},
 				],
 				default: 'smartscraper',
 			},
@@ -65,6 +70,8 @@ export class ScrapegraphAi implements INodeType {
 			...smartcrawlerFields,
 			...markdownifyOperations,
 			...markdownifyFields,
+			...agenticscraperOperations,
+			...agenticscraperFields,
 		],
 	};
 
@@ -227,6 +234,46 @@ export class ScrapegraphAi implements INodeType {
 								website_url: websiteUrl,
 								render_heavy_js: renderHeavyJs,
 							},
+							json: true,
+						});
+
+						returnData.push({ json: response, pairedItem: { item: i } });
+					}
+				}
+
+				if (resource === 'agenticscraper') {
+					if (operation === 'automate') {
+						const url = this.getNodeParameter('url', i) as string;
+						const useSession = this.getNodeParameter('useSession', i) as boolean;
+						const stepsData = this.getNodeParameter('steps', i) as Array<{ step: string }>;
+						const aiExtraction = this.getNodeParameter('aiExtraction', i) as boolean;
+						
+						// Extract steps from the collection format
+						const steps = stepsData.map(item => item.step);
+
+						const body: any = {
+							url: url,
+							use_session: useSession,
+							steps: steps,
+						};
+
+						// Add AI extraction parameters if enabled
+						if (aiExtraction) {
+							const userPrompt = this.getNodeParameter('userPrompt', i) as string;
+							const outputSchema = this.getNodeParameter('outputSchema', i) as string;
+							
+							body.user_prompt = userPrompt;
+							body.output_schema = outputSchema;
+						}
+
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+							method: 'POST',
+							url: `${baseUrl}/agenticscraper`,
+							headers: {
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body: body,
 							json: true,
 						});
 

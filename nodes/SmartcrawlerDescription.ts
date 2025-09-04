@@ -129,7 +129,7 @@ export const smartcrawlerFields: INodeProperties[] = [
 		name: 'useOutputSchema',
 		type: 'boolean',
 		default: false,
-		description: 'Enable to define a custom JSON schema for structured output',
+		description: 'Whether to define a custom JSON schema for structured output',
 		displayOptions: {
 			show: {
 				resource: ['smartcrawler'],
@@ -157,7 +157,7 @@ export const smartcrawlerFields: INodeProperties[] = [
 		name: 'renderHeavyJs',
 		type: 'boolean',
 		default: false,
-		description: 'Enable to render JavaScript-heavy websites (additional credits will be charged)',
+		description: 'Whether to render JavaScript-heavy websites (additional credits will be charged)',
 		displayOptions: {
 			show: {
 				resource: ['smartcrawler'],

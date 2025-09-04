@@ -57,7 +57,7 @@ export const smartscraperFields: INodeProperties[] = [
 		name: 'useOutputSchema',
 		type: 'boolean',
 		default: false,
-		description: 'Enable to define a custom JSON schema for structured output',
+		description: 'Whether to define a custom JSON schema for structured output',
 		displayOptions: {
 			show: {
 				resource: ['smartscraper'],
@@ -85,7 +85,7 @@ export const smartscraperFields: INodeProperties[] = [
 		name: 'renderHeavyJs',
 		type: 'boolean',
 		default: false,
-		description: 'Enable to render JavaScript-heavy websites (additional credits will be charged)',
+		description: 'Whether to render JavaScript-heavy websites (additional credits will be charged)',
 		displayOptions: {
 			show: {
 				resource: ['smartscraper'],

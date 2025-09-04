@@ -5,6 +5,7 @@ import type {
 	INodeTypeDescription,
 	NodeConnectionType,
 } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 
 import { smartscraperFields, smartscraperOperations } from '../SmartscraperDescription';
 import { searchscraperFields, searchscraperOperations } from '../SearchscraperDescription';
@@ -97,7 +98,7 @@ export class ScrapegraphAi implements INodeType {
 							try {
 								requestBody.output_schema = JSON.parse(outputSchema);
 							} catch (error) {
-								throw new Error(`Invalid JSON in Output Schema: ${error.message}`);
+								throw new NodeOperationError(this.getNode(), `Invalid JSON in Output Schema: ${error.message}`);
 							}
 						}
 
@@ -131,7 +132,7 @@ export class ScrapegraphAi implements INodeType {
 							try {
 								requestBody.output_schema = JSON.parse(outputSchema);
 							} catch (error) {
-								throw new Error(`Invalid JSON in Output Schema: ${error.message}`);
+								throw new NodeOperationError(this.getNode(), `Invalid JSON in Output Schema: ${error.message}`);
 							}
 						}
 
@@ -177,7 +178,7 @@ export class ScrapegraphAi implements INodeType {
 							try {
 								requestBody.output_schema = JSON.parse(outputSchema);
 							} catch (error) {
-								throw new Error(`Invalid JSON in Output Schema: ${error.message}`);
+								throw new NodeOperationError(this.getNode(), `Invalid JSON in Output Schema: ${error.message}`);
 							}
 						}
 

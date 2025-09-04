@@ -43,7 +43,7 @@ export const searchscraperFields: INodeProperties[] = [
 		name: 'useOutputSchema',
 		type: 'boolean',
 		default: false,
-		description: 'Enable to define a custom JSON schema for structured output',
+		description: 'Whether to define a custom JSON schema for structured output',
 		displayOptions: {
 			show: {
 				resource: ['searchscraper'],

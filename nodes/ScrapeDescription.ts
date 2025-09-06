@@ -15,7 +15,7 @@ export const scrapeOperations: INodeProperties[] = [
 			{
 				name: 'Scrape',
 				value: 'scrape',
-				action: 'Scrape webpage content with optional JavaScript rendering',
+				action: 'Scrape webpage content with optional javascript rendering',
 				description: 'Scrape webpage content with optional JavaScript rendering',
 			},
 		],

@@ -41,8 +41,12 @@ export class ScrapegraphAi implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Smart Scraper',
-						value: 'smartscraper',
+						name: 'Markdownify',
+						value: 'markdownify',
+					},
+					{
+						name: 'Scrape',
+						value: 'scrape',
 					},
 					{
 						name: 'Search Scraper',
@@ -53,12 +57,8 @@ export class ScrapegraphAi implements INodeType {
 						value: 'smartcrawler',
 					},
 					{
-						name: 'Markdownify',
-						value: 'markdownify',
-					},
-					{
-						name: 'Scrape',
-						value: 'scrape',
+						name: 'Smart Scraper',
+						value: 'smartscraper',
 					},
 				],
 				default: 'smartscraper',

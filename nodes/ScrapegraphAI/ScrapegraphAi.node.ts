@@ -11,6 +11,7 @@ import { smartscraperFields, smartscraperOperations } from '../SmartscraperDescr
 import { searchscraperFields, searchscraperOperations } from '../SearchscraperDescription';
 import { markdownifyFields, markdownifyOperations } from '../MarkdownifyDescription';
 import { smartcrawlerFields, smartcrawlerOperations } from '../SmartcrawlerDescription';
+import { scrapeFields, scrapeOperations } from '../ScrapeDescription';
 
 export class ScrapegraphAi implements INodeType {
 	description: INodeTypeDescription = {
@@ -55,6 +56,10 @@ export class ScrapegraphAi implements INodeType {
 						name: 'Markdownify',
 						value: 'markdownify',
 					},
+					{
+						name: 'Scrape',
+						value: 'scrape',
+					},
 				],
 				default: 'smartscraper',
 			},
@@ -66,6 +71,8 @@ export class ScrapegraphAi implements INodeType {
 			...smartcrawlerFields,
 			...markdownifyOperations,
 			...markdownifyFields,
+			...scrapeOperations,
+			...scrapeFields,
 		],
 	};
 
@@ -220,6 +227,29 @@ export class ScrapegraphAi implements INodeType {
 						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
 							method: 'POST',
 							url: `${baseUrl}/markdownify`,
+							headers: {
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body: {
+								website_url: websiteUrl,
+								render_heavy_js: renderHeavyJs,
+							},
+							json: true,
+						});
+
+						returnData.push({ json: response, pairedItem: { item: i } });
+					}
+				}
+
+				if (resource === 'scrape') {
+					if (operation === 'scrape') {
+						const websiteUrl = this.getNodeParameter('websiteUrl', i) as string;
+						const renderHeavyJs = this.getNodeParameter('renderHeavyJs', i) as boolean;
+
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+							method: 'POST',
+							url: `${baseUrl}/scrape`,
 							headers: {
 								'Accept': 'application/json',
 								'Content-Type': 'application/json',

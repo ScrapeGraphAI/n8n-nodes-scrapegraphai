@@ -97,6 +97,8 @@ export class ScrapegraphAi implements INodeType {
 					if (operation === 'scrape') {
 						const websiteUrl = this.getNodeParameter('websiteUrl', i) as string;
 						const userPrompt = this.getNodeParameter('userPrompt', i) as string;
+						const enableScrolling = this.getNodeParameter('enableScrolling', i, false) as boolean;
+						const enablePagination = this.getNodeParameter('enablePagination', i, false) as boolean;
 						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
 						const renderHeavyJs = this.getNodeParameter('renderHeavyJs', i, false) as boolean;
 
@@ -105,6 +107,22 @@ export class ScrapegraphAi implements INodeType {
 							user_prompt: userPrompt,
 							render_heavy_js: renderHeavyJs,
 						};
+
+						// Add number_of_scrolls if scrolling is enabled
+						if (enableScrolling) {
+							const numberOfScrolls = this.getNodeParameter('numberOfScrolls', i) as number;
+							if (numberOfScrolls && numberOfScrolls > 0) {
+								requestBody.number_of_scrolls = numberOfScrolls;
+							}
+						}
+
+						// Add total_pages if pagination is enabled
+						if (enablePagination) {
+							const totalPages = this.getNodeParameter('totalPages', i) as number;
+							if (totalPages && totalPages > 1) {
+								requestBody.total_pages = totalPages;
+							}
+						}
 
 						// Add output_schema if enabled and provided
 						if (useOutputSchema) {
@@ -134,11 +152,31 @@ export class ScrapegraphAi implements INodeType {
 				if (resource === 'searchscraper') {
 					if (operation === 'search') {
 						const userPrompt = this.getNodeParameter('userPrompt', i) as string;
+						const numResults = this.getNodeParameter('numResults', i) as number;
+						const enableScrolling = this.getNodeParameter('enableScrolling', i, false) as boolean;
+						const enablePagination = this.getNodeParameter('enablePagination', i, false) as boolean;
 						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
 
 						const requestBody: any = {
 							user_prompt: userPrompt,
+							num_results: numResults,
 						};
+
+						// Add number_of_scrolls if scrolling is enabled
+						if (enableScrolling) {
+							const numberOfScrolls = this.getNodeParameter('numberOfScrolls', i) as number;
+							if (numberOfScrolls && numberOfScrolls > 0) {
+								requestBody.number_of_scrolls = numberOfScrolls;
+							}
+						}
+
+						// Add total_pages if pagination is enabled
+						if (enablePagination) {
+							const totalPages = this.getNodeParameter('totalPages', i) as number;
+							if (totalPages && totalPages > 1) {
+								requestBody.total_pages = totalPages;
+							}
+						}
 
 						// Add output_schema if enabled and provided
 						if (useOutputSchema) {

@@ -93,4 +93,58 @@ export const smartscraperFields: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Enable Infinite Scrolling',
+		name: 'enableScrolling',
+		type: 'boolean',
+		default: false,
+		description: 'Whether to enable infinite scrolling to load more content by scrolling down the page',
+		displayOptions: {
+			show: {
+				resource: ['smartscraper'],
+				operation: ['scrape'],
+			},
+		},
+	},
+	{
+		displayName: 'Number of Scrolls',
+		name: 'numberOfScrolls',
+		type: 'number',
+		default: 3,
+		description: 'Number of times to scroll down the page to load more content',
+		displayOptions: {
+			show: {
+				resource: ['smartscraper'],
+				operation: ['scrape'],
+				enableScrolling: [true],
+			},
+		},
+	},
+	{
+		displayName: 'Enable Pagination',
+		name: 'enablePagination',
+		type: 'boolean',
+		default: false,
+		description: 'Whether to enable pagination to scrape multiple pages of content',
+		displayOptions: {
+			show: {
+				resource: ['smartscraper'],
+				operation: ['scrape'],
+			},
+		},
+	},
+	{
+		displayName: 'Total Pages',
+		name: 'totalPages',
+		type: 'number',
+		default: 5,
+		description: 'Total number of pages to scrape for pagination',
+		displayOptions: {
+			show: {
+				resource: ['smartscraper'],
+				operation: ['scrape'],
+				enablePagination: [true],
+			},
+		},
+	},
 ]; 

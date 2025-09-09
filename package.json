@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-scrapegraphai",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "n8n node for ScrapegraphAI web scraping and data extraction",
   "keywords": [
     "n8n-community-node-package"

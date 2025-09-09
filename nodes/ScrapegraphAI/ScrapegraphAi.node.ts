@@ -12,6 +12,7 @@ import { searchscraperFields, searchscraperOperations } from '../SearchscraperDe
 import { markdownifyFields, markdownifyOperations } from '../MarkdownifyDescription';
 import { smartcrawlerFields, smartcrawlerOperations } from '../SmartcrawlerDescription';
 import { scrapeFields, scrapeOperations } from '../ScrapeDescription';
+import { agenticscraperFields, agenticscraperOperations } from '../AgenticscraperDescription';
 
 export class ScrapegraphAi implements INodeType {
 	description: INodeTypeDescription = {
@@ -41,6 +42,10 @@ export class ScrapegraphAi implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
+						name: 'Agentic Scraper',
+						value: 'agenticscraper',
+					},
+					{
 						name: 'Markdownify',
 						value: 'markdownify',
 					},
@@ -63,6 +68,8 @@ export class ScrapegraphAi implements INodeType {
 				],
 				default: 'smartscraper',
 			},
+			...agenticscraperOperations,
+			...agenticscraperFields,
 			...smartscraperOperations,
 			...smartscraperFields,
 			...searchscraperOperations,
@@ -258,6 +265,62 @@ export class ScrapegraphAi implements INodeType {
 								website_url: websiteUrl,
 								render_heavy_js: renderHeavyJs,
 							},
+							json: true,
+						});
+
+						returnData.push({ json: response, pairedItem: { item: i } });
+					}
+				}
+
+				if (resource === 'agenticscraper') {
+					if (operation === 'execute') {
+						const url = this.getNodeParameter('url', i) as string;
+						const stepsData = this.getNodeParameter('steps', i) as any;
+						const useSession = this.getNodeParameter('useSession', i, false) as boolean;
+						const aiExtraction = this.getNodeParameter('aiExtraction', i, true) as boolean;
+
+						// Extract steps from the fixed collection format
+						const steps = stepsData.step?.map((s: any) => s.action).filter((action: string) => action.trim() !== '') || [];
+
+						// Validate that at least one step is provided
+						if (steps.length === 0) {
+							throw new NodeOperationError(this.getNode(), 'At least one browser interaction step is required');
+						}
+
+						const requestBody: any = {
+							url: url,
+							steps: steps,
+							use_session: useSession,
+							ai_extraction: aiExtraction,
+						};
+
+						// Add user_prompt if AI extraction is enabled
+						if (aiExtraction) {
+							const userPrompt = this.getNodeParameter('userPrompt', i, '') as string;
+							if (userPrompt) {
+								requestBody.user_prompt = userPrompt;
+							}
+
+							// Add output_schema if enabled and provided
+							const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
+							if (useOutputSchema) {
+								const outputSchema = this.getNodeParameter('outputSchema', i) as string;
+								try {
+									requestBody.output_schema = JSON.parse(outputSchema);
+								} catch (error) {
+									throw new NodeOperationError(this.getNode(), `Invalid JSON in Output Schema: ${error.message}`);
+								}
+							}
+						}
+
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+							method: 'POST',
+							url: `${baseUrl}/agentic-scrapper`,
+							headers: {
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body: requestBody,
 							json: true,
 						});
 

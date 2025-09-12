@@ -28,6 +28,7 @@ export class ScrapegraphAi implements INodeType {
 		},
 		inputs: ['main'] as NodeConnectionType[],
 		outputs: ['main'] as NodeConnectionType[],
+		usableAsTool: true,
 		credentials: [
 			{
 				name: 'scrapegraphAIApi',

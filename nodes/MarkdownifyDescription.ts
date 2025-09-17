@@ -18,6 +18,12 @@ export const markdownifyOperations: INodeProperties[] = [
 				action: 'Convert a webpage or article to clean markdown useful for blogs dev docs and more',
 				description: 'Convert a webpage or article to clean markdown – useful for blogs, dev docs and more',
 			},
+			{
+				name: 'Get Status',
+				value: 'getStatus',
+				action: 'Get markdown conversion status',
+				description: 'Retrieve the status and results of a markdown conversion',
+			},
 		],
 		default: 'convert',
 	},
@@ -48,6 +54,20 @@ export const markdownifyFields: INodeProperties[] = [
 			show: {
 				resource: ['markdownify'],
 				operation: ['convert'],
+			},
+		},
+	},
+	{
+		displayName: 'Request ID',
+		name: 'requestId',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'Unique request identifier',
+		displayOptions: {
+			show: {
+				resource: ['markdownify'],
+				operation: ['getStatus'],
 			},
 		},
 	},

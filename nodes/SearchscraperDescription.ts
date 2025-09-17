@@ -18,6 +18,12 @@ export const searchscraperOperations: INodeProperties[] = [
 				action: 'Perform ai powered site wide search and structured data extraction ideal for knowledge retrieval',
 				description: 'Perform AI-powered site-wide search and structured data extraction – ideal for knowledge retrieval',
 			},
+			{
+				name: 'Get Status',
+				value: 'getStatus',
+				action: 'Get search scraper status',
+				description: 'Retrieve the status and results of a search scraping operation',
+			},
 		],
 		default: 'search',
 	},
@@ -148,6 +154,33 @@ export const searchscraperFields: INodeProperties[] = [
 				resource: ['searchscraper'],
 				operation: ['search'],
 				enablePagination: [true],
+			},
+		},
+	},
+	{
+		displayName: 'Extraction Mode',
+		name: 'extractionMode',
+		type: 'boolean',
+		default: true,
+		description: 'True for AI extraction mode (structured data), False for markdown conversion mode',
+		displayOptions: {
+			show: {
+				resource: ['searchscraper'],
+				operation: ['search'],
+			},
+		},
+	},
+	{
+		displayName: 'Request ID',
+		name: 'requestId',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'Unique request identifier',
+		displayOptions: {
+			show: {
+				resource: ['searchscraper'],
+				operation: ['getStatus'],
 			},
 		},
 	},

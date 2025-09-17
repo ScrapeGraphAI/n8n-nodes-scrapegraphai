@@ -18,6 +18,18 @@ export const agenticscraperOperations: INodeProperties[] = [
 				action: 'Execute browser automation steps with optional AI extraction',
 				description: 'Perform browser interactions like clicking, typing, and navigating, with optional AI-powered data extraction',
 			},
+			{
+				name: 'Get Live Session URL',
+				value: 'getLiveSessionUrl',
+				action: 'Get live session URL for browser interaction',
+				description: 'Generate a live session URL for real-time browser interaction',
+			},
+			{
+				name: 'Stop Session',
+				value: 'stopSession',
+				action: 'Stop an active browser session',
+				description: 'Terminate an active browser session',
+			},
 		],
 		default: 'execute',
 	},
@@ -144,6 +156,48 @@ export const agenticscraperFields: INodeProperties[] = [
 				operation: ['execute'],
 				aiExtraction: [true],
 				useOutputSchema: [true],
+			},
+		},
+	},
+	{
+		displayName: 'URL',
+		name: 'liveSessionUrl',
+		type: 'string',
+		required: true,
+		default: '',
+		placeholder: 'https://example.com',
+		description: 'URL for the live session',
+		displayOptions: {
+			show: {
+				resource: ['agenticscraper'],
+				operation: ['getLiveSessionUrl'],
+			},
+		},
+	},
+	{
+		displayName: 'Timeout',
+		name: 'timeout',
+		type: 'number',
+		default: 300,
+		description: 'Timeout for the live session in seconds',
+		displayOptions: {
+			show: {
+				resource: ['agenticscraper'],
+				operation: ['getLiveSessionUrl'],
+			},
+		},
+	},
+	{
+		displayName: 'Session ID',
+		name: 'sessionId',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'Session identifier to stop',
+		displayOptions: {
+			show: {
+				resource: ['agenticscraper'],
+				operation: ['stopSession'],
 			},
 		},
 	},

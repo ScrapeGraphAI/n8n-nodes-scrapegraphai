@@ -18,12 +18,34 @@ export const searchscraperOperations: INodeProperties[] = [
 				action: 'Perform ai powered site wide search and structured data extraction ideal for knowledge retrieval',
 				description: 'Perform AI-powered site-wide search and structured data extraction – ideal for knowledge retrieval',
 			},
+			{
+				name: 'Get Status',
+				value: 'getStatus',
+				action: 'Get the status and results of a search operation',
+				description: 'Retrieve the status and results of a search scraping operation by request ID',
+			},
 		],
 		default: 'search',
 	},
 ];
 
 export const searchscraperFields: INodeProperties[] = [
+	// Fields for getStatus operation
+	{
+		displayName: 'Request ID',
+		name: 'requestId',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'The request ID returned from a search operation',
+		displayOptions: {
+			show: {
+				resource: ['searchscraper'],
+				operation: ['getStatus'],
+			},
+		},
+	},
+	// Fields for search operation
 	{
 		displayName: 'User Prompt',
 		name: 'userPrompt',
@@ -96,6 +118,19 @@ export const searchscraperFields: INodeProperties[] = [
 				value: 20,
 			},
 		],
+	},
+	{
+		displayName: 'Extraction Mode',
+		name: 'extractionMode',
+		type: 'boolean',
+		default: true,
+		description: 'Whether to use AI extraction (true) for structured data or markdown conversion (false) for raw content',
+		displayOptions: {
+			show: {
+				resource: ['searchscraper'],
+				operation: ['search'],
+			},
+		},
 	},
 	{
 		displayName: 'Enable Infinite Scrolling',

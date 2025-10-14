@@ -148,12 +148,28 @@ export class ScrapegraphAi implements INodeType {
 
 						returnData.push({ json: response, pairedItem: { item: i } });
 					}
+
+					if (operation === 'getStatus') {
+						const requestId = this.getNodeParameter('requestId', i) as string;
+
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+							method: 'GET',
+							url: `${baseUrl}/smartscraper/${requestId}`,
+							headers: {
+								'Accept': 'application/json',
+							},
+							json: true,
+						});
+
+						returnData.push({ json: response, pairedItem: { item: i } });
+					}
 				}
 
 				if (resource === 'searchscraper') {
 					if (operation === 'search') {
 						const userPrompt = this.getNodeParameter('userPrompt', i) as string;
 						const numResults = this.getNodeParameter('numResults', i) as number;
+						const extractionMode = this.getNodeParameter('extractionMode', i, true) as boolean;
 						const enableScrolling = this.getNodeParameter('enableScrolling', i, false) as boolean;
 						const enablePagination = this.getNodeParameter('enablePagination', i, false) as boolean;
 						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
@@ -161,6 +177,7 @@ export class ScrapegraphAi implements INodeType {
 						const requestBody: any = {
 							user_prompt: userPrompt,
 							num_results: numResults,
+							extraction_mode: extractionMode,
 						};
 
 						// Add number_of_scrolls if scrolling is enabled
@@ -197,6 +214,21 @@ export class ScrapegraphAi implements INodeType {
 								'Content-Type': 'application/json',
 							},
 							body: requestBody,
+							json: true,
+						});
+
+						returnData.push({ json: response, pairedItem: { item: i } });
+					}
+
+					if (operation === 'getStatus') {
+						const requestId = this.getNodeParameter('requestId', i) as string;
+
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+							method: 'GET',
+							url: `${baseUrl}/searchscraper/${requestId}`,
+							headers: {
+								'Accept': 'application/json',
+							},
 							json: true,
 						});
 
@@ -280,6 +312,21 @@ export class ScrapegraphAi implements INodeType {
 							body: {
 								website_url: websiteUrl,
 								render_heavy_js: renderHeavyJs,
+							},
+							json: true,
+						});
+
+						returnData.push({ json: response, pairedItem: { item: i } });
+					}
+
+					if (operation === 'getStatus') {
+						const requestId = this.getNodeParameter('requestId', i) as string;
+
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+							method: 'GET',
+							url: `${baseUrl}/markdownify/${requestId}`,
+							headers: {
+								'Accept': 'application/json',
 							},
 							json: true,
 						});

@@ -18,12 +18,34 @@ export const smartscraperOperations: INodeProperties[] = [
 				action: 'Autonomously extract live data from any website perfect for e commerce job boards lead capture and more',
 				description: 'Autonomously extract live data from any website – perfect for e-commerce, job boards, lead capture and more',
 			},
+			{
+				name: 'Get Status',
+				value: 'getStatus',
+				action: 'Get the status and results of a scraping operation',
+				description: 'Retrieve the status and results of a scraping operation by request ID',
+			},
 		],
 		default: 'scrape',
 	},
 ];
 
 export const smartscraperFields: INodeProperties[] = [
+	// Fields for getStatus operation
+	{
+		displayName: 'Request ID',
+		name: 'requestId',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'The request ID returned from a scrape operation',
+		displayOptions: {
+			show: {
+				resource: ['smartscraper'],
+				operation: ['getStatus'],
+			},
+		},
+	},
+	// Fields for scrape operation
 	{
 		displayName: 'Website URL',
 		name: 'websiteUrl',

@@ -30,6 +30,7 @@ export const markdownifyOperations: INodeProperties[] = [
 ];
 
 export const markdownifyFields: INodeProperties[] = [
+	// Fields for getStatus operation
 	{
 		displayName: 'Request ID',
 		name: 'requestId',

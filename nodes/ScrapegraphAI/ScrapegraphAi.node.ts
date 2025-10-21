@@ -21,7 +21,7 @@ export class ScrapegraphAi implements INodeType {
 		icon: 'file:../scrapegraphAI.svg',
 		group: ['transform'],
 		version: 1,
-		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
+		subtitle: '={{$parameter["operation"] ? $parameter["operation"] + ": " + $parameter["resource"] : $parameter["resource"]}}',
 		description: 'Turn any webpage into usable data in one shot – ScrapegraphAI explores the website and extracts the content you need.',
 		defaults: {
 			name: 'ScrapegraphAI',
@@ -88,8 +88,11 @@ export class ScrapegraphAi implements INodeType {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
 		const resource = this.getNodeParameter('resource', 0) as string;
-		const operation = this.getNodeParameter('operation', 0) as string;
-		
+		// Only load operation for resources that still use it
+		const operation = (resource === 'scrape' || resource === 'agenticscraper')
+			? this.getNodeParameter('operation', 0) as string
+			: undefined;
+
 		const baseUrl = 'https://api.scrapegraphai.com/v1';
 		
 		for (let i = 0; i < items.length; i++) {
@@ -205,64 +208,47 @@ export class ScrapegraphAi implements INodeType {
 				}
 
 				if (resource === 'smartcrawler') {
-					if (operation === 'crawl') {
-						const url = this.getNodeParameter('url', i) as string;
-						const prompt = this.getNodeParameter('prompt', i) as string;
-						const cacheWebsite = this.getNodeParameter('cacheWebsite', i) as boolean;
-						const depth = this.getNodeParameter('depth', i) as number;
-						const maxPages = this.getNodeParameter('maxPages', i) as number;
-						const sameDomainOnly = this.getNodeParameter('sameDomainOnly', i) as boolean;
-						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
-						const renderHeavyJs = this.getNodeParameter('renderHeavyJs', i, false) as boolean;
+					const url = this.getNodeParameter('url', i) as string;
+					const prompt = this.getNodeParameter('prompt', i) as string;
+					const cacheWebsite = this.getNodeParameter('cacheWebsite', i) as boolean;
+					const depth = this.getNodeParameter('depth', i) as number;
+					const maxPages = this.getNodeParameter('maxPages', i) as number;
+					const sameDomainOnly = this.getNodeParameter('sameDomainOnly', i) as boolean;
+					const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
+					const renderHeavyJs = this.getNodeParameter('renderHeavyJs', i, false) as boolean;
 
-						const requestBody: any = {
-							url: url,
-							prompt: prompt,
-							cache_website: cacheWebsite,
-							depth: depth,
-							max_pages: maxPages,
-							same_domain_only: sameDomainOnly,
-							render_heavy_js: renderHeavyJs,
-						};
+					const requestBody: any = {
+						url: url,
+						prompt: prompt,
+						cache_website: cacheWebsite,
+						depth: depth,
+						max_pages: maxPages,
+						same_domain_only: sameDomainOnly,
+						render_heavy_js: renderHeavyJs,
+					};
 
-						// Add output_schema if enabled and provided
-						if (useOutputSchema) {
-							const outputSchema = this.getNodeParameter('outputSchema', i) as string;
-							try {
-								requestBody.output_schema = JSON.parse(outputSchema);
-							} catch (error) {
-								throw new NodeOperationError(this.getNode(), `Invalid JSON in Output Schema: ${error.message}`);
-							}
+					// Add output_schema if enabled and provided
+					if (useOutputSchema) {
+						const outputSchema = this.getNodeParameter('outputSchema', i) as string;
+						try {
+							requestBody.output_schema = JSON.parse(outputSchema);
+						} catch (error) {
+							throw new NodeOperationError(this.getNode(), `Invalid JSON in Output Schema: ${error.message}`);
 						}
-
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
-							method: 'POST',
-							url: `${baseUrl}/crawl`,
-							headers: {
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-							body: requestBody,
-							json: true,
-						});
-
-						returnData.push({ json: response, pairedItem: { item: i } });
 					}
 
-					if (operation === 'getStatus') {
-						const taskId = this.getNodeParameter('taskId', i) as string;
+					const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+						method: 'POST',
+						url: `${baseUrl}/crawl`,
+						headers: {
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+						},
+						body: requestBody,
+						json: true,
+					});
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
-							method: 'GET',
-							url: `${baseUrl}/crawl/${taskId}`,
-							headers: {
-								'Accept': 'application/json',
-							},
-							json: true,
-						});
-
-						returnData.push({ json: response, pairedItem: { item: i } });
-					}
+					returnData.push({ json: response, pairedItem: { item: i } });
 				}
 
 				if (resource === 'markdownify') {

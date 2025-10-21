@@ -1,27 +1,6 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-export const smartscraperOperations: INodeProperties[] = [
-	{
-		displayName: 'Operation',
-		name: 'operation',
-		type: 'options',
-		noDataExpression: true,
-		displayOptions: {
-			show: {
-				resource: ['smartscraper'],
-			},
-		},
-		options: [
-			{
-				name: 'Scrape',
-				value: 'scrape',
-				action: 'Autonomously extract live data from any website perfect for e commerce job boards lead capture and more',
-				description: 'Autonomously extract live data from any website – perfect for e-commerce, job boards, lead capture and more',
-			},
-		],
-		default: 'scrape',
-	},
-];
+export const smartscraperOperations: INodeProperties[] = [];
 
 export const smartscraperFields: INodeProperties[] = [
 	{
@@ -34,7 +13,6 @@ export const smartscraperFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['smartscraper'],
-				operation: ['scrape'],
 			},
 		},
 	},
@@ -48,7 +26,6 @@ export const smartscraperFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['smartscraper'],
-				operation: ['scrape'],
 			},
 		},
 	},

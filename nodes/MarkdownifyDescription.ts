@@ -1,27 +1,6 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-export const markdownifyOperations: INodeProperties[] = [
-	{
-		displayName: 'Operation',
-		name: 'operation',
-		type: 'options',
-		noDataExpression: true,
-		displayOptions: {
-			show: {
-				resource: ['markdownify'],
-			},
-		},
-		options: [
-			{
-				name: 'Convert',
-				value: 'convert',
-				action: 'Convert a webpage or article to clean markdown useful for blogs dev docs and more',
-				description: 'Convert a webpage or article to clean markdown – useful for blogs, dev docs and more',
-			},
-		],
-		default: 'convert',
-	},
-];
+export const markdownifyOperations: INodeProperties[] = [];
 
 export const markdownifyFields: INodeProperties[] = [
 	{
@@ -34,7 +13,6 @@ export const markdownifyFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['markdownify'],
-				operation: ['convert'],
 			},
 		},
 	},

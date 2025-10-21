@@ -1,49 +1,8 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-export const smartcrawlerOperations: INodeProperties[] = [
-	{
-		displayName: 'Operation',
-		name: 'operation',
-		type: 'options',
-		noDataExpression: true,
-		displayOptions: {
-			show: {
-				resource: ['smartcrawler'],
-			},
-		},
-		options: [
-			{
-				name: 'Crawl',
-				value: 'crawl',
-				action: 'Give a single URL – the AI crawler follows internal links to extract structured data across multiple pages',
-				description: 'Give a single URL – the AI crawler follows internal links to extract structured data across multiple pages',
-			},
-			{
-				name: 'Get Status',
-				value: 'getStatus',
-				action: 'Get the status and results of a crawl job using its task ID',
-				description: 'Get the status and results of a crawl job using its task ID',
-			},
-		],
-		default: 'crawl',
-	},
-];
+export const smartcrawlerOperations: INodeProperties[] = [];
 
 export const smartcrawlerFields: INodeProperties[] = [
-	{
-		displayName: 'Task ID',
-		name: 'taskId',
-		type: 'string',
-		required: true,
-		default: '',
-		description: 'The task ID returned from a crawl operation',
-		displayOptions: {
-			show: {
-				resource: ['smartcrawler'],
-				operation: ['getStatus'],
-			},
-		},
-	},
 	{
 		displayName: 'URL',
 		name: 'url',
@@ -54,7 +13,6 @@ export const smartcrawlerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['smartcrawler'],
-				operation: ['crawl'],
 			},
 		},
 	},
@@ -68,7 +26,6 @@ export const smartcrawlerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['smartcrawler'],
-				operation: ['crawl'],
 			},
 		},
 	},
@@ -81,7 +38,6 @@ export const smartcrawlerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['smartcrawler'],
-				operation: ['crawl'],
 			},
 		},
 	},
@@ -94,7 +50,6 @@ export const smartcrawlerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['smartcrawler'],
-				operation: ['crawl'],
 			},
 		},
 	},
@@ -107,7 +62,6 @@ export const smartcrawlerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['smartcrawler'],
-				operation: ['crawl'],
 			},
 		},
 	},
@@ -120,7 +74,6 @@ export const smartcrawlerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['smartcrawler'],
-				operation: ['crawl'],
 			},
 		},
 	},
@@ -133,7 +86,6 @@ export const smartcrawlerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['smartcrawler'],
-				operation: ['crawl'],
 			},
 		},
 	},
@@ -147,7 +99,6 @@ export const smartcrawlerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['smartcrawler'],
-				operation: ['crawl'],
 				useOutputSchema: [true],
 			},
 		},
@@ -161,7 +112,6 @@ export const smartcrawlerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['smartcrawler'],
-				operation: ['crawl'],
 			},
 		},
 	},

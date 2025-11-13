@@ -13,6 +13,7 @@ import { markdownifyFields, markdownifyOperations } from '../MarkdownifyDescript
 import { smartcrawlerFields, smartcrawlerOperations } from '../SmartcrawlerDescription';
 import { scrapeFields, scrapeOperations } from '../ScrapeDescription';
 import { agenticscraperFields, agenticscraperOperations } from '../AgenticscraperDescription';
+import { toonifyFields, toonifyOperations } from '../ToonifyDescription';
 
 export class ScrapegraphAi implements INodeType {
 	description: INodeTypeDescription = {
@@ -66,6 +67,10 @@ export class ScrapegraphAi implements INodeType {
 						name: 'Smart Scraper',
 						value: 'smartscraper',
 					},
+					{
+						name: 'Toonify',
+						value: 'toonify',
+					},
 				],
 				default: 'smartscraper',
 			},
@@ -81,6 +86,8 @@ export class ScrapegraphAi implements INodeType {
 			...markdownifyFields,
 			...scrapeOperations,
 			...scrapeFields,
+			...toonifyOperations,
+			...toonifyFields,
 		],
 	};
 
@@ -360,6 +367,27 @@ export class ScrapegraphAi implements INodeType {
 								'Content-Type': 'application/json',
 							},
 							body: requestBody,
+							json: true,
+						});
+
+						returnData.push({ json: response, pairedItem: { item: i } });
+					}
+				}
+
+				if (resource === 'toonify') {
+					if (operation === 'convert') {
+						const imageUrl = this.getNodeParameter('imageUrl', i) as string;
+
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+							method: 'POST',
+							url: `${baseUrl}/toonify`,
+							headers: {
+								'Accept': 'application/json',
+								'Content-Type': 'application/json',
+							},
+							body: {
+								image_url: imageUrl,
+							},
 							json: true,
 						});
 

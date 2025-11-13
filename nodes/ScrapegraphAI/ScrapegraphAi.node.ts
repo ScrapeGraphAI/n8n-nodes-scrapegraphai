@@ -70,6 +70,7 @@ export class ScrapegraphAi implements INodeType {
 					{
 						name: 'Toonify',
 						value: 'toonify',
+						description: 'Convert JSON to TOON format for reduced token usage',
 					},
 				],
 				default: 'smartscraper',
@@ -376,22 +377,63 @@ export class ScrapegraphAi implements INodeType {
 
 				if (resource === 'toonify') {
 					if (operation === 'convert') {
-						const imageUrl = this.getNodeParameter('imageUrl', i) as string;
+						const jsonPayload = this.getNodeParameter('jsonPayload', i) as string;
+						let requestBody: any = {};
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
-							method: 'POST',
-							url: `${baseUrl}/toonify`,
-							headers: {
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-							body: {
-								image_url: imageUrl,
-							},
-							json: true,
-						});
+						try {
+							requestBody = JSON.parse(jsonPayload);
+						} catch (error) {
+							throw new NodeOperationError(this.getNode(), `Invalid JSON in Payload: ${error.message}`);
+						}
 
-						returnData.push({ json: response, pairedItem: { item: i } });
+						try {
+							const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
+								method: 'POST',
+								url: `${baseUrl}/toonify`,
+								headers: {
+									'Accept': 'application/json',
+									'Content-Type': 'application/json',
+								},
+								body: requestBody,
+								json: true,
+							});
+
+							// Handle different response formats
+							let processedResponse;
+							if (typeof response === 'string') {
+								// If response is a string (TOON format), wrap it in an object
+								processedResponse = {
+									toon_format: response,
+									original_data: requestBody,
+									conversion_type: 'JSON_to_TOON'
+								};
+							} else if (response && typeof response === 'object') {
+								// If response is an object, use it as-is but add metadata
+								processedResponse = {
+									...response,
+									original_data: requestBody,
+									conversion_type: 'JSON_to_TOON'
+								};
+							} else {
+								// Fallback for unexpected response types
+								processedResponse = {
+									raw_response: response,
+									original_data: requestBody,
+									conversion_type: 'JSON_to_TOON',
+									note: 'Unexpected response format'
+								};
+							}
+
+							returnData.push({ json: processedResponse, pairedItem: { item: i } });
+						} catch (error) {
+							// Enhanced error handling
+							const errorMessage = error.response?.data?.error || error.message || 'Unknown error occurred';
+							const statusCode = error.response?.status || 'Unknown';
+							
+							throw new NodeOperationError(this.getNode(), 
+								`Toonify API Error (${statusCode}): ${errorMessage}. Please check your API key and payload format.`
+							);
+						}
 					}
 				}
 			} catch (error) {

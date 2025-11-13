@@ -13,10 +13,10 @@ export const toonifyOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Convert',
+				name: 'Convert to TOON',
 				value: 'convert',
-				action: 'Convert image to toon/cartoon style',
-				description: 'Apply toonification effect to convert an image to cartoon/toon style',
+				action: 'Convert JSON data to TOON format',
+				description: 'Serialize structured data to TOON (Token-Oriented Object Notation) format to reduce LLM token usage by 30-60%',
 			},
 		],
 		default: 'convert',
@@ -25,17 +25,20 @@ export const toonifyOperations: INodeProperties[] = [
 
 export const toonifyFields: INodeProperties[] = [
 	{
-		displayName: 'Image URL',
-		name: 'imageUrl',
-		type: 'string',
+		displayName: 'JSON Data',
+		name: 'jsonPayload',
+		type: 'json',
 		required: true,
-		default: '',
-		description: 'URL of the image to convert to toon/cartoon style',
+		default: '{\n  "products": [\n    {\n      "sku": "LAP-001",\n      "name": "Gaming Laptop",\n      "price": 1299.99\n    },\n    {\n      "sku": "MOU-042",\n      "name": "Wireless Mouse",\n      "price": 29.99\n    }\n  ]\n}',
+		description: 'JSON data to convert to TOON format. TOON (Token-Oriented Object Notation) is a compact serialization format that reduces token usage by 30-60% compared to JSON while maintaining readability.',
 		displayOptions: {
 			show: {
 				resource: ['toonify'],
 				operation: ['convert'],
 			},
+		},
+		typeOptions: {
+			rows: 10,
 		},
 	},
 ];

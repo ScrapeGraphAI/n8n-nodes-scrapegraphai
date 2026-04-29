@@ -7,13 +7,34 @@ import type {
 } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 
-import { smartscraperFields, smartscraperOperations } from '../SmartscraperDescription';
-import { searchscraperFields, searchscraperOperations } from '../SearchscraperDescription';
-import { markdownifyFields, markdownifyOperations } from '../MarkdownifyDescription';
-import { smartcrawlerFields, smartcrawlerOperations } from '../SmartcrawlerDescription';
-import { scrapeFields, scrapeOperations } from '../ScrapeDescription';
-import { agenticscraperFields, agenticscraperOperations } from '../AgenticscraperDescription';
-import { toonifyFields, toonifyOperations } from '../ToonifyDescription';
+import * as scrape from './actions/scrape/scrape.operation';
+import * as extract from './actions/extract/extract.operation';
+import * as search from './actions/search/search.operation';
+
+import { CRAWL_RESOURCE, crawlOperations } from './actions/crawl/crawl.resource';
+import * as crawlStart from './actions/crawl/start.operation';
+import * as crawlGetStatus from './actions/crawl/getStatus.operation';
+import * as crawlStop from './actions/crawl/stop.operation';
+import * as crawlResume from './actions/crawl/resume.operation';
+import * as crawlDelete from './actions/crawl/delete.operation';
+
+import { MONITOR_RESOURCE, monitorOperations } from './actions/monitor/monitor.resource';
+import * as monitorCreate from './actions/monitor/create.operation';
+import * as monitorList from './actions/monitor/list.operation';
+import * as monitorGet from './actions/monitor/get.operation';
+import * as monitorUpdate from './actions/monitor/update.operation';
+import * as monitorPause from './actions/monitor/pause.operation';
+import * as monitorResume from './actions/monitor/resume.operation';
+import * as monitorDelete from './actions/monitor/delete.operation';
+import * as monitorActivity from './actions/monitor/activity.operation';
+
+import * as credits from './actions/credits/get.operation';
+
+import { HISTORY_RESOURCE, historyOperations } from './actions/history/history.resource';
+import * as historyGet from './actions/history/get.operation';
+import * as historyList from './actions/history/list.operation';
+
+import { listCrawls, listHistory, listMonitors } from './methods/loadOptions';
 
 export class ScrapegraphAi implements INodeType {
 	description: INodeTypeDescription = {
@@ -23,19 +44,13 @@ export class ScrapegraphAi implements INodeType {
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Turn any webpage into usable data in one shot – ScrapegraphAI explores the website and extracts the content you need.',
-		defaults: {
-			name: 'ScrapegraphAI',
-		},
+		description:
+			'Turn any webpage into usable data with the ScrapeGraphAI v2 API — scrape, extract, search, crawl, monitor, history, credits.',
+		defaults: { name: 'ScrapegraphAI' },
 		inputs: ['main'] as NodeConnectionType[],
 		outputs: ['main'] as NodeConnectionType[],
 		usableAsTool: true,
-		credentials: [
-			{
-				name: 'scrapegraphAIApi',
-				required: true,
-			},
-		],
+		credentials: [{ name: 'scrapegraphAIApi', required: true }],
 		properties: [
 			{
 				displayName: 'Resource',
@@ -43,53 +58,50 @@ export class ScrapegraphAi implements INodeType {
 				type: 'options',
 				noDataExpression: true,
 				options: [
-					{
-						name: 'Agentic Scraper',
-						value: 'agenticscraper',
-					},
-					{
-						name: 'Markdownify',
-						value: 'markdownify',
-					},
-					{
-						name: 'Scrape',
-						value: 'scrape',
-					},
-					{
-						name: 'Search Scraper',
-						value: 'searchscraper',
-					},
-					{
-						name: 'Smart Crawler',
-						value: 'smartcrawler',
-					},
-					{
-						name: 'Smart Scraper',
-						value: 'smartscraper',
-					},
-					{
-						name: 'Toonify',
-						value: 'toonify',
-						description: 'Convert JSON to TOON format for reduced token usage',
-					},
+					{ name: 'Credit', value: 'credits' },
+					{ name: 'Crawl', value: CRAWL_RESOURCE },
+					{ name: 'Extract', value: 'extract' },
+					{ name: 'History', value: HISTORY_RESOURCE },
+					{ name: 'Monitor', value: MONITOR_RESOURCE },
+					{ name: 'Scrape', value: 'scrape' },
+					{ name: 'Search', value: 'search' },
 				],
-				default: 'smartscraper',
+				default: 'scrape',
 			},
-			...agenticscraperOperations,
-			...agenticscraperFields,
-			...smartscraperOperations,
-			...smartscraperFields,
-			...searchscraperOperations,
-			...searchscraperFields,
-			...smartcrawlerOperations,
-			...smartcrawlerFields,
-			...markdownifyOperations,
-			...markdownifyFields,
-			...scrapeOperations,
-			...scrapeFields,
-			...toonifyOperations,
-			...toonifyFields,
+			...scrape.scrapeOperations,
+			...scrape.scrapeFields,
+			...extract.extractOperations,
+			...extract.extractFields,
+			...search.searchOperations,
+			...search.searchFields,
+			...crawlOperations,
+			...crawlStart.startFields,
+			...crawlGetStatus.getStatusFields,
+			...crawlStop.stopFields,
+			...crawlResume.resumeFields,
+			...crawlDelete.deleteFields,
+			...monitorOperations,
+			...monitorCreate.createFields,
+			...monitorList.listFields,
+			...monitorGet.getFields,
+			...monitorUpdate.updateFields,
+			...monitorPause.pauseFields,
+			...monitorResume.resumeFields,
+			...monitorDelete.deleteFields,
+			...monitorActivity.activityFields,
+			...credits.creditsOperations,
+			...historyOperations,
+			...historyGet.getFields,
+			...historyList.listFields,
 		],
+	};
+
+	methods = {
+		listSearch: {
+			listCrawls,
+			listHistory,
+			listMonitors,
+		},
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
@@ -97,354 +109,65 @@ export class ScrapegraphAi implements INodeType {
 		const returnData: INodeExecutionData[] = [];
 		const resource = this.getNodeParameter('resource', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
-		
-		const baseUrl = 'https://api.scrapegraphai.com/v1';
-		
+		const fn = OPERATIONS[resource]?.[operation];
+
+		if (!fn) {
+			throw new NodeOperationError(
+				this.getNode(),
+				`Unsupported combination: resource '${resource}' with operation '${operation}'`,
+			);
+		}
+
 		for (let i = 0; i < items.length; i++) {
 			try {
-				if (resource === 'smartscraper') {
-					if (operation === 'scrape') {
-						const websiteUrl = this.getNodeParameter('websiteUrl', i) as string;
-						const userPrompt = this.getNodeParameter('userPrompt', i) as string;
-						const enableScrolling = this.getNodeParameter('enableScrolling', i, false) as boolean;
-						const enablePagination = this.getNodeParameter('enablePagination', i, false) as boolean;
-						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
-						const renderHeavyJs = this.getNodeParameter('renderHeavyJs', i, false) as boolean;
-
-						const requestBody: any = {
-							website_url: websiteUrl,
-							user_prompt: userPrompt,
-							render_heavy_js: renderHeavyJs,
-						};
-
-						// Add number_of_scrolls if scrolling is enabled
-						if (enableScrolling) {
-							const numberOfScrolls = this.getNodeParameter('numberOfScrolls', i) as number;
-							if (numberOfScrolls && numberOfScrolls > 0) {
-								requestBody.number_of_scrolls = numberOfScrolls;
-							}
-						}
-
-						// Add total_pages if pagination is enabled
-						if (enablePagination) {
-							const totalPages = this.getNodeParameter('totalPages', i) as number;
-							if (totalPages && totalPages > 1) {
-								requestBody.total_pages = totalPages;
-							}
-						}
-
-						// Add output_schema if enabled and provided
-						if (useOutputSchema) {
-							const outputSchema = this.getNodeParameter('outputSchema', i) as string;
-							try {
-								requestBody.output_schema = JSON.parse(outputSchema);
-							} catch (error) {
-								throw new NodeOperationError(this.getNode(), `Invalid JSON in Output Schema: ${error.message}`);
-							}
-						}
-
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
-							method: 'POST',
-							url: `${baseUrl}/smartscraper`,
-							headers: {
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-							body: requestBody,
-							json: true,
-						});
-
-						returnData.push({ json: response, pairedItem: { item: i } });
-					}
-				}
-
-				if (resource === 'searchscraper') {
-					if (operation === 'search') {
-						const userPrompt = this.getNodeParameter('userPrompt', i) as string;
-						const numResults = this.getNodeParameter('numResults', i) as number;
-						const enableScrolling = this.getNodeParameter('enableScrolling', i, false) as boolean;
-						const enablePagination = this.getNodeParameter('enablePagination', i, false) as boolean;
-						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
-
-						const requestBody: any = {
-							user_prompt: userPrompt,
-							num_results: numResults,
-						};
-
-						// Add number_of_scrolls if scrolling is enabled
-						if (enableScrolling) {
-							const numberOfScrolls = this.getNodeParameter('numberOfScrolls', i) as number;
-							if (numberOfScrolls && numberOfScrolls > 0) {
-								requestBody.number_of_scrolls = numberOfScrolls;
-							}
-						}
-
-						// Add total_pages if pagination is enabled
-						if (enablePagination) {
-							const totalPages = this.getNodeParameter('totalPages', i) as number;
-							if (totalPages && totalPages > 1) {
-								requestBody.total_pages = totalPages;
-							}
-						}
-
-						// Add output_schema if enabled and provided
-						if (useOutputSchema) {
-							const outputSchema = this.getNodeParameter('outputSchema', i) as string;
-							try {
-								requestBody.output_schema = JSON.parse(outputSchema);
-							} catch (error) {
-								throw new NodeOperationError(this.getNode(), `Invalid JSON in Output Schema: ${error.message}`);
-							}
-						}
-
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
-							method: 'POST',
-							url: `${baseUrl}/searchscraper`,
-							headers: {
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-							body: requestBody,
-							json: true,
-						});
-
-						returnData.push({ json: response, pairedItem: { item: i } });
-					}
-				}
-
-				if (resource === 'smartcrawler') {
-					if (operation === 'crawl') {
-						const url = this.getNodeParameter('url', i) as string;
-						const prompt = this.getNodeParameter('prompt', i) as string;
-						const cacheWebsite = this.getNodeParameter('cacheWebsite', i) as boolean;
-						const depth = this.getNodeParameter('depth', i) as number;
-						const maxPages = this.getNodeParameter('maxPages', i) as number;
-						const sameDomainOnly = this.getNodeParameter('sameDomainOnly', i) as boolean;
-						const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
-						const renderHeavyJs = this.getNodeParameter('renderHeavyJs', i, false) as boolean;
-
-						const requestBody: any = {
-							url: url,
-							prompt: prompt,
-							cache_website: cacheWebsite,
-							depth: depth,
-							max_pages: maxPages,
-							same_domain_only: sameDomainOnly,
-							render_heavy_js: renderHeavyJs,
-						};
-
-						// Add output_schema if enabled and provided
-						if (useOutputSchema) {
-							const outputSchema = this.getNodeParameter('outputSchema', i) as string;
-							try {
-								requestBody.output_schema = JSON.parse(outputSchema);
-							} catch (error) {
-								throw new NodeOperationError(this.getNode(), `Invalid JSON in Output Schema: ${error.message}`);
-							}
-						}
-
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
-							method: 'POST',
-							url: `${baseUrl}/crawl`,
-							headers: {
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-							body: requestBody,
-							json: true,
-						});
-
-						returnData.push({ json: response, pairedItem: { item: i } });
-					}
-
-					if (operation === 'getStatus') {
-						const taskId = this.getNodeParameter('taskId', i) as string;
-
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
-							method: 'GET',
-							url: `${baseUrl}/crawl/${taskId}`,
-							headers: {
-								'Accept': 'application/json',
-							},
-							json: true,
-						});
-
-						returnData.push({ json: response, pairedItem: { item: i } });
-					}
-				}
-
-				if (resource === 'markdownify') {
-					if (operation === 'convert') {
-						const websiteUrl = this.getNodeParameter('websiteUrl', i) as string;
-						const renderHeavyJs = this.getNodeParameter('renderHeavyJs', i, false) as boolean;
-
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
-							method: 'POST',
-							url: `${baseUrl}/markdownify`,
-							headers: {
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-							body: {
-								website_url: websiteUrl,
-								render_heavy_js: renderHeavyJs,
-							},
-							json: true,
-						});
-
-						returnData.push({ json: response, pairedItem: { item: i } });
-					}
-				}
-
-				if (resource === 'scrape') {
-					if (operation === 'scrape') {
-						const websiteUrl = this.getNodeParameter('websiteUrl', i) as string;
-						const renderHeavyJs = this.getNodeParameter('renderHeavyJs', i) as boolean;
-
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
-							method: 'POST',
-							url: `${baseUrl}/scrape`,
-							headers: {
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-							body: {
-								website_url: websiteUrl,
-								render_heavy_js: renderHeavyJs,
-							},
-							json: true,
-						});
-
-						returnData.push({ json: response, pairedItem: { item: i } });
-					}
-				}
-
-				if (resource === 'agenticscraper') {
-					if (operation === 'execute') {
-						const url = this.getNodeParameter('url', i) as string;
-						const stepsData = this.getNodeParameter('steps', i) as any;
-						const useSession = this.getNodeParameter('useSession', i, false) as boolean;
-						const aiExtraction = this.getNodeParameter('aiExtraction', i, true) as boolean;
-
-						// Extract steps from the fixed collection format
-						const steps = stepsData.step?.map((s: any) => s.action).filter((action: string) => action.trim() !== '') || [];
-
-						// Validate that at least one step is provided
-						if (steps.length === 0) {
-							throw new NodeOperationError(this.getNode(), 'At least one browser interaction step is required');
-						}
-
-						const requestBody: any = {
-							url: url,
-							steps: steps,
-							use_session: useSession,
-							ai_extraction: aiExtraction,
-						};
-
-						// Add user_prompt if AI extraction is enabled
-						if (aiExtraction) {
-							const userPrompt = this.getNodeParameter('userPrompt', i, '') as string;
-							if (userPrompt) {
-								requestBody.user_prompt = userPrompt;
-							}
-
-							// Add output_schema if enabled and provided
-							const useOutputSchema = this.getNodeParameter('useOutputSchema', i, false) as boolean;
-							if (useOutputSchema) {
-								const outputSchema = this.getNodeParameter('outputSchema', i) as string;
-								try {
-									requestBody.output_schema = JSON.parse(outputSchema);
-								} catch (error) {
-									throw new NodeOperationError(this.getNode(), `Invalid JSON in Output Schema: ${error.message}`);
-								}
-							}
-						}
-
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
-							method: 'POST',
-							url: `${baseUrl}/agentic-scrapper`,
-							headers: {
-								'Accept': 'application/json',
-								'Content-Type': 'application/json',
-							},
-							body: requestBody,
-							json: true,
-						});
-
-						returnData.push({ json: response, pairedItem: { item: i } });
-					}
-				}
-
-				if (resource === 'toonify') {
-					if (operation === 'convert') {
-						const jsonPayload = this.getNodeParameter('jsonPayload', i) as string;
-						let requestBody: any = {};
-
-						try {
-							requestBody = JSON.parse(jsonPayload);
-						} catch (error) {
-							throw new NodeOperationError(this.getNode(), `Invalid JSON in Payload: ${error.message}`);
-						}
-
-						try {
-							const response = await this.helpers.httpRequestWithAuthentication.call(this, 'scrapegraphAIApi', {
-								method: 'POST',
-								url: `${baseUrl}/toonify`,
-								headers: {
-									'Accept': 'application/json',
-									'Content-Type': 'application/json',
-								},
-								body: requestBody,
-								json: true,
-							});
-
-							// Handle different response formats
-							let processedResponse;
-							if (typeof response === 'string') {
-								// If response is a string (TOON format), wrap it in an object
-								processedResponse = {
-									toon_format: response,
-									original_data: requestBody,
-									conversion_type: 'JSON_to_TOON'
-								};
-							} else if (response && typeof response === 'object') {
-								// If response is an object, use it as-is but add metadata
-								processedResponse = {
-									...response,
-									original_data: requestBody,
-									conversion_type: 'JSON_to_TOON'
-								};
-							} else {
-								// Fallback for unexpected response types
-								processedResponse = {
-									raw_response: response,
-									original_data: requestBody,
-									conversion_type: 'JSON_to_TOON',
-									note: 'Unexpected response format'
-								};
-							}
-
-							returnData.push({ json: processedResponse, pairedItem: { item: i } });
-						} catch (error) {
-							// Enhanced error handling
-							const errorMessage = error.response?.data?.error || error.message || 'Unknown error occurred';
-							const statusCode = error.response?.status || 'Unknown';
-							
-							throw new NodeOperationError(this.getNode(), 
-								`Toonify API Error (${statusCode}): ${errorMessage}. Please check your API key and payload format.`
-							);
-						}
-					}
-				}
-			} catch (error) {
+				const result = await fn.call(this, i);
+				if (Array.isArray(result)) returnData.push(...result);
+				else returnData.push(result);
+			} catch (err) {
 				if (this.continueOnFail()) {
-					returnData.push({ json: { error: error.message } });
+					returnData.push({
+						json: { error: (err as Error).message },
+						pairedItem: { item: i },
+					});
 					continue;
 				}
-				throw error;
+				throw err;
 			}
 		}
 
 		return [returnData];
 	}
-} 
+}
+
+type OperationFn = (
+	this: IExecuteFunctions,
+	itemIndex: number,
+) => Promise<INodeExecutionData | INodeExecutionData[]>;
+
+const OPERATIONS: Record<string, Record<string, OperationFn>> = {
+	scrape: { scrape: scrape.execute },
+	extract: { extract: extract.execute },
+	search: { search: search.execute },
+	[CRAWL_RESOURCE]: {
+		start: crawlStart.execute,
+		getStatus: crawlGetStatus.execute,
+		stop: crawlStop.execute,
+		resume: crawlResume.execute,
+		delete: crawlDelete.execute,
+	},
+	[MONITOR_RESOURCE]: {
+		create: monitorCreate.execute,
+		list: monitorList.execute,
+		get: monitorGet.execute,
+		update: monitorUpdate.execute,
+		pause: monitorPause.execute,
+		resume: monitorResume.execute,
+		delete: monitorDelete.execute,
+		activity: monitorActivity.execute,
+	},
+	[HISTORY_RESOURCE]: {
+		get: historyGet.execute,
+		list: historyList.execute,
+	},
+	credits: { get: credits.execute },
+};

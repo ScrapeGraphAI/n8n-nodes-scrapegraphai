@@ -27,8 +27,8 @@ export const startFields: INodeProperties[] = [
 		displayName: 'Max Pages',
 		name: 'maxPages',
 		type: 'number',
-		default: 5,
-		typeOptions: { minValue: 1 },
+		default: 50,
+		typeOptions: { minValue: 1, maxValue: 1000 },
 		description: 'Maximum number of pages to crawl',
 		displayOptions: { show: { resource: [CRAWL_RESOURCE], operation: OPS } },
 	},
@@ -45,9 +45,17 @@ export const startFields: INodeProperties[] = [
 		displayName: 'Max Links per Page',
 		name: 'maxLinksPerPage',
 		type: 'number',
-		default: 0,
-		typeOptions: { minValue: 0 },
-		description: 'Cap on links expanded per page (0 = unlimited)',
+		default: 10,
+		typeOptions: { minValue: 1 },
+		description: 'Cap on links expanded per page',
+		displayOptions: { show: { resource: [CRAWL_RESOURCE], operation: OPS } },
+	},
+	{
+		displayName: 'Allow External Links',
+		name: 'allowExternal',
+		type: 'boolean',
+		default: false,
+		description: 'Whether to follow links to other domains. Off by default — same-origin only.',
 		displayOptions: { show: { resource: [CRAWL_RESOURCE], operation: OPS } },
 	},
 	{
@@ -71,6 +79,26 @@ export const startFields: INodeProperties[] = [
 		displayOptions: { show: { resource: [CRAWL_RESOURCE], operation: OPS } },
 	},
 	{
+		displayName: 'Content Types',
+		name: 'contentTypes',
+		type: 'multiOptions',
+		default: [],
+		description: 'Optional. Limit crawled pages to these MIME types. Leave empty for all.',
+		options: [
+			{ name: 'CSV', value: 'text/csv' },
+			{ name: 'Excel (.xlsx)', value: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+			{ name: 'HTML', value: 'text/html' },
+			{ name: 'JPEG', value: 'image/jpeg' },
+			{ name: 'PDF', value: 'application/pdf' },
+			{ name: 'Plain Text', value: 'text/plain' },
+			{ name: 'PNG', value: 'image/png' },
+			{ name: 'PowerPoint (.pptx)', value: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' },
+			{ name: 'WebP', value: 'image/webp' },
+			{ name: 'Word (.docx)', value: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
+		],
+		displayOptions: { show: { resource: [CRAWL_RESOURCE], operation: OPS } },
+	},
+	{
 		...fetchConfigField,
 		displayOptions: { show: { resource: [CRAWL_RESOURCE], operation: OPS } },
 	},
@@ -84,18 +112,22 @@ export async function execute(
 	const maxPages = this.getNodeParameter('maxPages', itemIndex) as number;
 	const maxDepth = this.getNodeParameter('maxDepth', itemIndex) as number;
 	const maxLinksPerPage = this.getNodeParameter('maxLinksPerPage', itemIndex) as number;
+	const allowExternal = this.getNodeParameter('allowExternal', itemIndex, false) as boolean;
 	const includePatterns = this.getNodeParameter('includePatterns', itemIndex, []) as string[];
 	const excludePatterns = this.getNodeParameter('excludePatterns', itemIndex, []) as string[];
+	const contentTypes = this.getNodeParameter('contentTypes', itemIndex, []) as string[];
 
 	const body: IDataObject = {
 		url,
 		formats: buildFormats.call(this, itemIndex),
 		maxPages,
 		maxDepth,
+		maxLinksPerPage,
 	};
-	if (maxLinksPerPage > 0) body.maxLinksPerPage = maxLinksPerPage;
+	if (allowExternal) body.allowExternal = true;
 	if (includePatterns.length > 0) body.includePatterns = includePatterns;
 	if (excludePatterns.length > 0) body.excludePatterns = excludePatterns;
+	if (contentTypes.length > 0) body.contentTypes = contentTypes;
 
 	const fetchConfig = buildFetchConfig.call(this, itemIndex);
 	if (Object.keys(fetchConfig).length > 0) body.fetchConfig = fetchConfig;

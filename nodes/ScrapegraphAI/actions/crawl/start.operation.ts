@@ -51,6 +51,14 @@ export const startFields: INodeProperties[] = [
 		displayOptions: { show: { resource: [CRAWL_RESOURCE], operation: OPS } },
 	},
 	{
+		displayName: 'Allow External Links',
+		name: 'allowExternal',
+		type: 'boolean',
+		default: false,
+		description: 'Whether to follow links to other domains. Off by default — same-origin only.',
+		displayOptions: { show: { resource: [CRAWL_RESOURCE], operation: OPS } },
+	},
+	{
 		displayName: 'Include Patterns',
 		name: 'includePatterns',
 		type: 'string',
@@ -71,6 +79,35 @@ export const startFields: INodeProperties[] = [
 		displayOptions: { show: { resource: [CRAWL_RESOURCE], operation: OPS } },
 	},
 	{
+		displayName: 'Content Types',
+		name: 'contentTypes',
+		type: 'multiOptions',
+		default: [],
+		description: 'Optional. Limit crawled pages to these MIME types. Leave empty for all.',
+		options: [
+			{ name: 'AVIF', value: 'image/avif' },
+			{ name: 'BMP', value: 'image/bmp' },
+			{ name: 'CSV', value: 'text/csv' },
+			{ name: 'DOCX (Word)', value: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
+			{ name: 'EPUB', value: 'application/epub+zip' },
+			{ name: 'GIF', value: 'image/gif' },
+			{ name: 'HEIC', value: 'image/heic' },
+			{ name: 'HTML', value: 'text/html' },
+			{ name: 'JPEG', value: 'image/jpeg' },
+			{ name: 'LaTeX', value: 'application/x-latex' },
+			{ name: 'ODT (OpenDocument)', value: 'application/vnd.oasis.opendocument.text' },
+			{ name: 'PDF', value: 'application/pdf' },
+			{ name: 'Plain Text', value: 'text/plain' },
+			{ name: 'PNG', value: 'image/png' },
+			{ name: 'PPTX (PowerPoint)', value: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' },
+			{ name: 'RTF', value: 'application/rtf' },
+			{ name: 'TIFF', value: 'image/tiff' },
+			{ name: 'WebP', value: 'image/webp' },
+			{ name: 'XLSX (Excel)', value: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+		],
+		displayOptions: { show: { resource: [CRAWL_RESOURCE], operation: OPS } },
+	},
+	{
 		...fetchConfigField,
 		displayOptions: { show: { resource: [CRAWL_RESOURCE], operation: OPS } },
 	},
@@ -84,18 +121,22 @@ export async function execute(
 	const maxPages = this.getNodeParameter('maxPages', itemIndex) as number;
 	const maxDepth = this.getNodeParameter('maxDepth', itemIndex) as number;
 	const maxLinksPerPage = this.getNodeParameter('maxLinksPerPage', itemIndex) as number;
+	const allowExternal = this.getNodeParameter('allowExternal', itemIndex, false) as boolean;
 	const includePatterns = this.getNodeParameter('includePatterns', itemIndex, []) as string[];
 	const excludePatterns = this.getNodeParameter('excludePatterns', itemIndex, []) as string[];
+	const contentTypes = this.getNodeParameter('contentTypes', itemIndex, []) as string[];
 
 	const body: IDataObject = {
 		url,
 		formats: buildFormats.call(this, itemIndex),
 		maxPages,
 		maxDepth,
+		maxLinksPerPage,
 	};
-	if (maxLinksPerPage > 0) body.maxLinksPerPage = maxLinksPerPage;
+	if (allowExternal) body.allowExternal = true;
 	if (includePatterns.length > 0) body.includePatterns = includePatterns;
 	if (excludePatterns.length > 0) body.excludePatterns = excludePatterns;
+	if (contentTypes.length > 0) body.contentTypes = contentTypes;
 
 	const fetchConfig = buildFetchConfig.call(this, itemIndex);
 	if (Object.keys(fetchConfig).length > 0) body.fetchConfig = fetchConfig;
